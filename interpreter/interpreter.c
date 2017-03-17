@@ -14,10 +14,24 @@
 // Global variable that indicates if the process is running.
 static bool is_running = true;
 
+// Custom logging macro
+// Prints error in the same way as printf to stderr
+// also stops program by settings is_running
+#define log_errf(msg, ...)                                      \
+    do {                                                        \
+        fprintf(stderr, "[error]: " msg "\n", ##__VA_ARGS__);   \
+        exit(1);                                                \
+    } while (0)
+
 // Print usage and exit
 void usageExit(char **argv) {
     fprintf(stderr, "usage: %s <bytecode>\n", argv[0]);
     exit(1);
+}
+
+// Validates if heap address is within bounds of actual heap
+bool validHeapAddress(uint32_t addr) {
+    return (0 <= addr) && (addr < SIZE_HEAP);
 }
 
 // Instruction execution semantics
@@ -44,10 +58,14 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
+    if (!validHeapAddress(regVal)) {
+        log_errf("heap address %p invalid", regVal);
+    }
+
     printf("puts r%d\n", regIdx); /* debug */
 
     // Calculate heap address with offsetting
-    uint32_t addr = regVal + ctx->heap;
+    uint32_t addr = ctx->heap + regVal;
 
     printf("%s", (char *) addr);
 }
@@ -56,11 +74,15 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
+    if (!validHeapAddress(regVal)) {
+        log_errf("heap address %p invalid", regVal);
+    }
+
     char buf[128];
     fgets(buf, 128, stdin);
 
     // Calculate heap address with offsetting
-    uint32_t addr = regVal + ctx->heap;
+    uint32_t addr = ctx->heap + regVal;
 
     strcpy(addr, buf);
 }
@@ -101,7 +123,7 @@ int main(int argc, char** argv) {
     VMContext vm;
     Reg r[NUM_REGS];
     FunPtr f[NUM_FUNCS];
-    uint32_t* heap;
+    uint32_t *heap;
     FILE* bytecode;
     uint32_t *pc;
     int codeSize = 0;
@@ -146,9 +168,6 @@ int main(int argc, char** argv) {
     }
 
     printf("done...\n");        /* debug */
-
-    // Free heap memory
-    free(heap);
 
     // Zero indicates normal termination.
     return 0;
