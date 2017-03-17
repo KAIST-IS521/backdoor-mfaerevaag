@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "minivm.h"
 
 #define NUM_REGS   (256)
@@ -23,7 +24,7 @@ void usageExit(char **argv) {
 
 void instr_halt(struct VMContext* ctx, const uint32_t instr)
 {
-    printf("halt\n");             /* debug */
+    printf("halt\n");           /* debug */
 
     is_running = false;
 }
@@ -39,8 +40,33 @@ void instr_ge(struct VMContext* ctx, const uint32_t instr) {}
 void instr_eq(struct VMContext* ctx, const uint32_t instr) {}
 void instr_ite(struct VMContext* ctx, const uint32_t instr) {}
 void instr_jump(struct VMContext* ctx, const uint32_t instr) {}
-void instr_puts(struct VMContext* ctx, const uint32_t instr) {}
-void instr_gets(struct VMContext* ctx, const uint32_t instr) {}
+
+void instr_puts(struct VMContext* ctx, const uint32_t instr)
+{
+    uint8_t regIdx = EXTRACT_B1(instr);
+    uint32_t regVal = ctx->r[regIdx].value;
+
+    printf("puts r%d\n", regIdx); /* debug */
+
+    // Calculate heap address with offsetting
+    uint32_t addr = regVal + ctx->heap;
+
+    printf("%s", (char *) addr);
+}
+
+void instr_gets(struct VMContext* ctx, const uint32_t instr)
+{
+    uint8_t regIdx = EXTRACT_B1(instr);
+    uint32_t regVal = ctx->r[regIdx].value;
+
+    char buf[128];
+    fgets(buf, 128, stdin);
+
+    // Calculate heap address with offsetting
+    uint32_t addr = regVal + ctx->heap;
+
+    strcpy(addr, buf);
+}
 
 // Initialize function table
 void initFuncs(FunPtr *f, uint32_t cnt) {
@@ -122,6 +148,7 @@ int main(int argc, char** argv) {
 
         stepVMContext(&vm, &pc);
     }
+
     printf("done...\n");        /* debug */
 
     // Free heap memory
