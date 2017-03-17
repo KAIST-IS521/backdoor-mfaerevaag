@@ -18,15 +18,51 @@ void usageExit(char **argv) {
     exit(1);
 }
 
+// Instruction execution semantics
+
+void instr_halt(struct VMContext* ctx, const uint32_t instr)
+{
+    printf("halt\n");             /* debug */
+
+    is_running = false;
+}
+
+void instr_load(struct VMContext* ctx, const uint32_t instr) {}
+void instr_store(struct VMContext* ctx, const uint32_t instr) {}
+void instr_move(struct VMContext* ctx, const uint32_t instr) {}
+void instr_puti(struct VMContext* ctx, const uint32_t instr){}
+void instr_add(struct VMContext* ctx, const uint32_t instr) {}
+void instr_sub(struct VMContext* ctx, const uint32_t instr) {}
+void instr_gt(struct VMContext* ctx, const uint32_t instr) {}
+void instr_ge(struct VMContext* ctx, const uint32_t instr) {}
+void instr_eq(struct VMContext* ctx, const uint32_t instr) {}
+void instr_ite(struct VMContext* ctx, const uint32_t instr) {}
+void instr_jump(struct VMContext* ctx, const uint32_t instr) {}
+void instr_puts(struct VMContext* ctx, const uint32_t instr) {}
+void instr_gets(struct VMContext* ctx, const uint32_t instr) {}
+
+// Initialize function table
 void initFuncs(FunPtr *f, uint32_t cnt) {
     uint32_t i;
     for (i = 0; i < cnt; i++) {
         f[i] = NULL;
     }
 
-    // TODO: initialize function pointers
-    // f[0x00] = halt;
-    // f[0x10] = load;
+    // Set function pointers in function table
+    f[0x00] = instr_halt;
+    f[0x10] = instr_load;
+    f[0x20] = instr_store;
+    f[0x30] = instr_move;
+    f[0x40] = instr_puti;
+    f[0x50] = instr_add;
+    f[0x60] = instr_sub;
+    f[0x70] = instr_gt;
+    f[0x80] = instr_ge;
+    f[0x90] = instr_eq;
+    f[0xa0] = instr_ite;
+    f[0xb0] = instr_jump;
+    f[0xc0] = instr_puts;
+    f[0xd0] = instr_gets;
 }
 
 void initRegs(Reg *r, uint32_t cnt)
