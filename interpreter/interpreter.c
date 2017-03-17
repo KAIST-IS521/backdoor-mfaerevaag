@@ -22,8 +22,7 @@ void usageExit(char **argv) {
 
 // Instruction execution semantics
 
-void instr_halt(struct VMContext* ctx, const uint32_t instr)
-{
+void instr_halt(struct VMContext* ctx, const uint32_t instr) {
     printf("halt\n");           /* debug */
 
     is_running = false;
@@ -41,8 +40,7 @@ void instr_eq(struct VMContext* ctx, const uint32_t instr) {}
 void instr_ite(struct VMContext* ctx, const uint32_t instr) {}
 void instr_jump(struct VMContext* ctx, const uint32_t instr) {}
 
-void instr_puts(struct VMContext* ctx, const uint32_t instr)
-{
+void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
@@ -54,8 +52,7 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr)
     printf("%s", (char *) addr);
 }
 
-void instr_gets(struct VMContext* ctx, const uint32_t instr)
-{
+void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
@@ -92,8 +89,7 @@ void initFuncs(FunPtr *f, uint32_t cnt) {
     f[0xd0] = instr_gets;
 }
 
-void initRegs(Reg *r, uint32_t cnt)
-{
+void initRegs(Reg *r, uint32_t cnt) {
     uint32_t i;
     for (i = 0; i < cnt; i++) {
         r[i].type = 0;
