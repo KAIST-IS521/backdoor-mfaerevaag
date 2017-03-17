@@ -8,6 +8,7 @@
 
 #define NUM_REGS   (256)
 #define NUM_FUNCS  (256)
+#define SIZE_HEAP  (8192)
 
 // Global variable that indicates if the process is running.
 static bool is_running = true;
@@ -78,6 +79,7 @@ int main(int argc, char** argv) {
     VMContext vm;
     Reg r[NUM_REGS];
     FunPtr f[NUM_FUNCS];
+    uint32_t* heap;
     FILE* bytecode;
     uint32_t *pc;
     int codeSize = 0;
@@ -89,8 +91,10 @@ int main(int argc, char** argv) {
     initRegs(r, NUM_REGS);
     // Initialize interpretation functions.
     initFuncs(f, NUM_FUNCS);
+    // Initialize heap
+    heap = malloc(SIZE_HEAP);
     // Initialize VM context.
-    initVMContext(&vm, NUM_REGS, NUM_FUNCS, r, f);
+    initVMContext(&vm, NUM_REGS, NUM_FUNCS, SIZE_HEAP, r, f, heap);
 
     // Load bytecode file
     bytecode = fopen(argv[1], "rb");
@@ -104,20 +108,24 @@ int main(int argc, char** argv) {
     codeSize = ftell(bytecode);   /* get offset of file pointer */
     rewind(bytecode);             /* move pointer to start of file */
 
-    printf("# instr: %d\n", codeSize / 4); /* debug */
-
     // Allocate and read code
     pc = malloc(codeSize);      /* allocate bytes according to code size */
     fread(pc, codeSize, 1, bytecode); /* read code */
     fclose(bytecode);
 
-    printf("running...\n");     /* debug */
+    printf("& heap: %p\n", heap);        /* debug */
+    printf("# instr: %d\n", codeSize / 4); /* debug */
+    printf("running...\n");                /* debug */
+
     while (is_running) {
         printf("pc: 0x%08x\n", *pc); /* debug */
 
         stepVMContext(&vm, &pc);
     }
     printf("done...\n");        /* debug */
+
+    // Free heap memory
+    free(heap);
 
     // Zero indicates normal termination.
     return 0;

@@ -21,11 +21,19 @@ void dispatch(struct VMContext* ctx, const uint32_t instr) {
 
 // Initializes a VMContext in-place.
 // initVMContext :: VMContext -> uint32_t -> uint32_t -> [Reg] -> [FunPtr] -> Effect()
-void initVMContext(struct VMContext* ctx, const uint32_t numRegs, const uint32_t numFuns, Reg* registers, FunPtr* funtable) {
+void initVMContext(struct VMContext* ctx,
+                   const uint32_t numRegs,
+                   const uint32_t numFuns,
+                   const uint32_t sizeHeap,
+                             Reg* registers,
+                          FunPtr* funtable,
+                        uint32_t* heap) {
     ctx->numRegs    = numRegs;
     ctx->numFuns    = numFuns;
+    ctx->sizeHeap   = sizeHeap;
     ctx->r          = registers;
     ctx->funtable   = funtable;
+    ctx->heap       = heap;
 }
 
 
@@ -41,4 +49,3 @@ void stepVMContext(struct VMContext* ctx, uint32_t** pc) {
     // Increment to next instruction.
     (*pc)++;
 }
-
