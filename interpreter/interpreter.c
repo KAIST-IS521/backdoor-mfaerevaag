@@ -79,7 +79,8 @@ int main(int argc, char** argv) {
     Reg r[NUM_REGS];
     FunPtr f[NUM_FUNCS];
     FILE* bytecode;
-    uint32_t* pc;
+    uint32_t *pc;
+    int codeSize = 0;
 
     // There should be at least one argument.
     if (argc < 2) usageExit(argv);
@@ -98,12 +99,25 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Get code size (number of bytes)
+    fseek(bytecode, 0, SEEK_END); /* jump to EOF */
+    codeSize = ftell(bytecode);   /* get offset of file pointer */
+    rewind(bytecode);             /* move pointer to start of file */
+
+    printf("# instr: %d\n", codeSize / 4); /* debug */
+
+    // Allocate and read code
+    pc = malloc(codeSize);      /* allocate bytes according to code size */
+    fread(pc, codeSize, 1, bytecode); /* read code */
+    fclose(bytecode);
+
+    printf("running...\n");     /* debug */
     while (is_running) {
-        // TODO: Read 4-byte bytecode, and set the pc accordingly
+        printf("pc: 0x%08x\n", *pc); /* debug */
+
         stepVMContext(&vm, &pc);
     }
-
-    fclose(bytecode);
+    printf("done...\n");        /* debug */
 
     // Zero indicates normal termination.
     return 0;
