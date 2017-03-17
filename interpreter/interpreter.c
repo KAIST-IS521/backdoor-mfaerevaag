@@ -12,8 +12,9 @@
 // Global variable that indicates if the process is running.
 static bool is_running = true;
 
-void usageExit() {
-    // TODO: show usage
+// Print usage and exit
+void usageExit(char **argv) {
+    fprintf(stderr, "usage: %s <bytecode>\n", argv[0]);
     exit(1);
 }
 
@@ -45,7 +46,7 @@ int main(int argc, char** argv) {
     uint32_t* pc;
 
     // There should be at least one argument.
-    if (argc < 2) usageExit();
+    if (argc < 2) usageExit(argv);
 
     // Initialize registers.
     initRegs(r, NUM_REGS);
