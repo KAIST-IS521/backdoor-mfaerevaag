@@ -34,6 +34,15 @@ bool validHeapAddress(uint32_t addr) {
     return (0 <= addr) && (addr < SIZE_HEAP);
 }
 
+uint32_t getHeapAddr(uint32_t heap, uint32_t offset) {
+    if (!validHeapAddress(offset)) {
+        log_errf("heap address %p invalid", offset);
+    }
+
+    return heap + offset;
+}
+
+
 // Instruction execution semantics
 
 void instr_halt(struct VMContext* ctx, const uint32_t instr) {
@@ -58,14 +67,10 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
-    if (!validHeapAddress(regVal)) {
-        log_errf("heap address %p invalid", regVal);
-    }
-
     printf("puts r%d\n", regIdx); /* debug */
 
     // Calculate heap address with offsetting
-    uint32_t addr = ctx->heap + regVal;
+    uint32_t addr = getHeapAddr(ctx->heap, regVal);
 
     printf("%s", (char *) addr);
 }
@@ -74,15 +79,11 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
-    if (!validHeapAddress(regVal)) {
-        log_errf("heap address %p invalid", regVal);
-    }
-
     char buf[128];
     fgets(buf, 128, stdin);
 
     // Calculate heap address with offsetting
-    uint32_t addr = ctx->heap + regVal;
+    uint32_t addr = getHeapAddr(ctx->heap, regVal);
 
     strcpy(addr, buf);
 }
