@@ -38,16 +38,14 @@ void usageExit(char **argv) {
 
 // Validates if instruction offset is valid
 void validateOffset(struct VMContext *ctx, uint32_t offset) {
-    if ((int32_t) offset < 0) {
-        log_errf("offset %d must be larger than zero\n", offset);
-    } else if (offset >= ctx->codeSize) {
-        log_errf("offset %d is larger than code size %d\n", offset, ctx->codeSize);
+    if (offset >= ctx->codeSize) {
+        log_errf("offset %d is invalid %d\n", offset, ctx->codeSize);
     }
 }
 
 // Validates if heap address is within bounds of actual heap
 void validateHeapAddress(struct VMContext *ctx, uint32_t offset) {
-    if ((0 < (int32_t) offset) || (offset >= ctx->sizeHeap)) {
+    if (offset >= ctx->sizeHeap) {
         log_errf("heap address 0x%u invalid\n", offset);
     }
 }
