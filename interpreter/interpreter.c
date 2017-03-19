@@ -113,6 +113,7 @@ void instrPuti(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t v = EXTRACT_B2(instr);
 
+    // Extend to four bytes
     uint32_t value = (uint32_t) v;
 
     debugf("puti r%d %d\n", destRegIdx, value); /* debug */
@@ -335,6 +336,10 @@ int main(int argc, char **argv) {
         }
         debugf("--------------------\n");
     }
+
+    // Free memory
+    free(heap);
+    free(bytecode);
 
     // Zero indicates normal termination.
     return 0;
