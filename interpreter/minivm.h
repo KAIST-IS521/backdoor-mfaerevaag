@@ -34,6 +34,9 @@ typedef struct Reg {
 } Reg;
 
 typedef struct VMContext {
+    uint32_t* bytecode; // Ptr to bytecode
+    uint32_t codeSize;  // Number of instructions
+    uint32_t pc;        // Current instruction in code
     uint32_t numRegs;
     uint32_t numFuns;
     uint32_t sizeHeap;
@@ -71,6 +74,8 @@ void dispatch(struct VMContext* ctx, const uint32_t instr);
 // Initializes a VMContext in-place.
 // initVMContext :: VMContext -> uint32_t -> uint32_t -> [Reg] -> [FunPtr] -> Effect()
 void initVMContext(struct VMContext* ctx,
+                     const uint32_t* bytecode,
+                      const uint32_t codeSize,
                       const uint32_t numRegs,
                       const uint32_t numFuns,
                       const uint32_t sizeHeap,
@@ -80,7 +85,7 @@ void initVMContext(struct VMContext* ctx,
 
 // Reads an instruction, executes it, then steps to the next instruction.
 // stepVMContext :: VMContext -> uint32_t** -> Effect()
-void stepVMContext(struct VMContext* ctx, uint32_t** pc);
+void stepVMContext(struct VMContext* ctx);
 
 
 //---------------------------------------------------------

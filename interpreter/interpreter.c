@@ -221,17 +221,34 @@ void initRegs(Reg *r, uint32_t cnt) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     VMContext vm;
     Reg r[NUM_REGS];
     FunPtr f[NUM_FUNCS];
     uint32_t *heap;
-    FILE* bytecode;
-    uint32_t *pc;
+    FILE *binaryFile;
+    uint32_t *bytecode;
     int codeSize = 0;
 
     // There should be at least one argument.
     if (argc < 2) usageExit(argv);
+
+    // Load bytecode file
+    binaryFile = fopen(argv[1], "rb");
+    if (binaryFile == NULL) {
+        perror("fopen");
+        return 1;
+    }
+
+    // Get code size (number of bytes)
+    fseek(binaryFile, 0, SEEK_END); /* jump to EOF */
+    codeSize = ftell(binaryFile);   /* get offset of file pointer */
+    rewind(binaryFile);             /* move pointer to start of file */
+
+    // Allocate and read code
+    bytecode = malloc(codeSize);      /* allocate bytes according to code size */
+    fread(bytecode, codeSize, 1, binaryFile); /* read code */
+    fclose(binaryFile);
 
     // Initialize registers.
     initRegs(r, NUM_REGS);
@@ -240,38 +257,27 @@ int main(int argc, char** argv) {
     // Initialize heap
     heap = malloc(SIZE_HEAP);
     // Initialize VM context.
-    initVMContext(&vm, NUM_REGS, NUM_FUNCS, SIZE_HEAP, r, f, heap);
-
-    // Load bytecode file
-    bytecode = fopen(argv[1], "rb");
-    if (bytecode == NULL) {
-        perror("fopen");
-        return 1;
-    }
-
-    // Get code size (number of bytes)
-    fseek(bytecode, 0, SEEK_END); /* jump to EOF */
-    codeSize = ftell(bytecode);   /* get offset of file pointer */
-    rewind(bytecode);             /* move pointer to start of file */
-
-    // Allocate and read code
-    pc = malloc(codeSize);      /* allocate bytes according to code size */
-    fread(pc, codeSize, 1, bytecode); /* read code */
-    fclose(bytecode);
+    initVMContext(&vm,
+                  bytecode,
+                  codeSize,
+                  NUM_REGS,
+                  NUM_FUNCS,
+                  SIZE_HEAP,
+                  r, f, heap);
 
     printf("& heap: %p\n", heap);        /* debug */
     printf("# instr: %d\n", codeSize / 4); /* debug */
     printf("running...\n\n");                /* debug */
 
     while (is_running) {
-        printf("pc: 0x%08x\n", *pc); /* debug */
+        printf("pc: %03d -> 0x%08x\n", vm.pc, vm.bytecode[vm.pc]); /* debug */
 
-        stepVMContext(&vm, &pc);
+        stepVMContext(&vm);
     }
 
     // Debug: print registers
     printf("\n------- regs -------\n");
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 5; i++) {
         printf("r%d: %u\n", i, vm.r[i].value);
     }
     printf("--------------------\n");
