@@ -1,8 +1,12 @@
-puti r0, 10
+; set number of loop iterations
+puti r0, 5
+; number to subtract by
 puti r1, 1
 
+; subtract
 sub r0, r0, r1
 
+; iterate
 ite r0, 2, 4
 
 halt
