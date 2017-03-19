@@ -1,0 +1,305 @@
+; login.mini
+; ----------
+; Markus Faerevaag @mfaerevaag
+
+; constants
+; ---------
+puti r0, 0
+puti r1, 1
+
+; table of memory contents
+; ------------------------
+; [0] = misc
+; [100] = "Failure\n\0"
+; [110] = "Success\n\0"
+; [255] = user input    (keep user memory in the back so we dont overwrite anything)
+
+; jump table
+; ----------
+; success = (169)
+; failure (172)
+
+; init string table
+; -----------------
+
+; [100] = "Failure\n\0"
+puti r10, 100
+
+puti r11, 'F'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'a'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'i'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'l'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'u'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'r'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'e'
+store r10, r11
+add r10, r10, r1
+
+; \n
+puti r11, 10
+store r10, r11
+add r10, r10, r1
+
+; \0
+store r10, r0
+
+; [110] = "Success\n\0"
+puti r10, 110
+
+puti r11, 'S'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'u'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'c'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'c'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 'e'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 's'
+store r10, r11
+add r10, r10, r1
+
+puti r11, 's'
+store r10, r11
+add r10, r10, r1
+
+; \n
+puti r11, 10
+store r10, r11
+add r10, r10, r1
+
+; \0
+store r10, r0
+
+; main
+; --------
+
+; username
+
+; [0] = "User: \n"
+puti r10, 0
+
+puti r11, 'U'
+store r10, r11
+add r10, r10, r1
+
+puti r12, 's'
+store r10, r12
+add r10, r10, r1
+
+puti r13, 'e'
+store r10, r13
+add r10, r10, r1
+
+puti r14, 'r'
+store r10, r14
+add r10, r10, r1
+
+puti r15, ':'
+store r10, r15
+add r10, r10, r1
+
+; space
+puti r16, 0x20
+store r10, r16
+
+; print prompt
+puti r10, 0
+puts r10
+
+; [0] = "user"
+puti r11, 'u'
+puti r15, 0
+
+; [255] = gets(username)
+puti r20, 255
+gets r20
+
+; check if matches, char by char
+
+; [255] == 'u'
+load r21, r20
+eq r9, r21, r11
+ite r9, 81, 172
+add r20, r20, r1
+
+; [256] == 's'
+load r21, r20
+eq r9, r21, r12
+ite r9, 85, 172
+add r20, r20, r1
+
+; [257] == 'e'
+load r21, r20
+eq r9, r21, r13
+ite r9, 89, 172
+add r20, r20, r1
+
+; [258] == 'r'
+load r21, r20
+eq r9, r21, r14
+ite r9, 93, 172
+add r20, r20, r1
+
+; [259] == '\0'
+load r21, r20
+eq r9, r21, r15
+ite r9, 97, 172
+add r20, r20, r1
+
+; password
+
+; [0] = "Password: \n"
+puti r10, 0
+
+puti r11, 'P'
+store r10, r11
+add r10, r10, r1
+
+puti r12, 'a'
+store r10, r12
+add r10, r10, r1
+
+puti r13, 's'
+store r10, r13
+add r10, r10, r1
+
+puti r14, 's'
+store r10, r14
+add r10, r10, r1
+
+puti r15, 'w'
+store r10, r15
+add r10, r10, r1
+
+puti r16, 'o'
+store r10, r16
+add r10, r10, r1
+
+puti r17, 'r'
+store r10, r17
+add r10, r10, r1
+
+puti r18, 'd'
+store r10, r18
+add r10, r10, r1
+
+puti r19, ':'
+store r10, r19
+add r10, r10, r1
+
+; space
+puti r20, 0x20
+store r10, r20
+
+; print prompt
+puti r10, 0
+puts r10
+
+; [0] = "password\0"
+puti r11, 'p'
+puti r19, 0
+
+; [255] = gets(password)
+puti r20, 255
+gets r20
+
+; check if matches, char by char
+
+; [255] == 'p'
+load r21, r20
+eq r9, r21, r11
+ite r9, 137, 172
+add r20, r20, r1
+
+; [256] == 'a'
+load r21, r20
+eq r9, r21, r12
+ite r9, 141, 172
+add r20, r20, r1
+
+; [257] == 's'
+load r21, r20
+eq r9, r21, r13
+ite r9, 145, 172
+add r20, r20, r1
+
+; [258] == 's'
+load r21, r20
+eq r9, r21, r14
+ite r9, 149, 172
+add r20, r20, r1
+
+; [259] == 'w'
+load r21, r20
+eq r9, r21, r15
+ite r9, 153, 172
+add r20, r20, r1
+
+; [260] == 'o'
+load r21, r20
+eq r9, r21, r16
+ite r9, 157, 172
+add r20, r20, r1
+
+; [261] == 'r'
+load r21, r20
+eq r9, r21, r17
+ite r9, 161, 172
+add r20, r20, r1
+
+; [262] == 'd'
+load r21, r20
+eq r9, r21, r18
+ite r9, 165, 172
+add r20, r20, r1
+
+; [263] == '\0'
+load r21, r20
+eq r9, r21, r19
+ite r9, 169, 172
+
+; success
+
+; print message
+puti r10, 110
+puts r10
+
+halt
+
+; failure
+
+; print message
+puti r10, 100
+puts r10
+
+halt

