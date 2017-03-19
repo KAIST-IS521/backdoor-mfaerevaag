@@ -85,7 +85,14 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
     *((uint32_t *) addr) = value;
 }
 
-void instr_move(struct VMContext* ctx, const uint32_t instr) {}
+void instr_move(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx = EXTRACT_B2(instr);
+
+    printf("move r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
+
+    ctx->r[destRegIdx].value = ctx->r[srcRegIdx].value;
+}
 
 void instr_puti(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
@@ -201,7 +208,7 @@ int main(int argc, char** argv) {
 
     printf("& heap: %p\n", heap);        /* debug */
     printf("# instr: %d\n", codeSize / 4); /* debug */
-    printf("running...\n");                /* debug */
+    printf("running...\n\n");                /* debug */
 
     while (is_running) {
         printf("pc: 0x%08x\n", *pc); /* debug */
@@ -209,7 +216,12 @@ int main(int argc, char** argv) {
         stepVMContext(&vm, &pc);
     }
 
-    printf("done...\n");        /* debug */
+    // Debug: print registers
+    printf("\n------- regs -------\n");
+    for (int i = 0; i < 3; i++) {
+        printf("r%d: %d\n", i, vm.r[i].value);
+    }
+    printf("--------------------\n");
 
     // Zero indicates normal termination.
     return 0;
