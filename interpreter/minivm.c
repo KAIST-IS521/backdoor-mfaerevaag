@@ -29,7 +29,7 @@ void initVMContext(struct VMContext* ctx,
                       const uint32_t sizeHeap,
                                 Reg* registers,
                              FunPtr* funtable,
-                           uint32_t* heap) {
+                            uint8_t* heap) {
     ctx->bytecode   = bytecode;
     ctx->codeSize   = codeSize;
     ctx->pc         = 0;

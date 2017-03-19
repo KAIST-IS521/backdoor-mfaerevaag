@@ -51,7 +51,7 @@ void validateHeapAddress(struct VMContext *ctx, uint32_t offset) {
 }
 
 // Calculate heap address with offsetting
-uint32_t *getHeapAddr(struct VMContext *ctx, uint32_t offset) {
+uint8_t *getHeapAddr(struct VMContext *ctx, uint32_t offset) {
     validateHeapAddress(ctx, offset);
 
     return ctx->heap + offset;
@@ -76,9 +76,10 @@ void instr_load(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("load r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t *addr = getHeapAddr(ctx, srcRegVal);
+    uint8_t *addr = getHeapAddr(ctx, srcRegVal);
 
-    uint32_t value = *((uint32_t *) (size_t) addr);
+    // Extend to four bytes
+    uint32_t value = 0 | *addr;
 
     ctx->r[destRegIdx].value = value;
 }
@@ -91,11 +92,12 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("store r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t *addr = getHeapAddr(ctx, destRegVal);
+    uint8_t *addr = getHeapAddr(ctx, destRegVal);
 
-    uint32_t value = (uint32_t) EXTRACT_B3(srcRegVal);
+    // Extract lower byte
+    uint8_t value = EXTRACT_B0(srcRegVal);
 
-    *((uint32_t *) addr) = value;
+    *addr = value;
 }
 
 void instr_move(struct VMContext* ctx, const uint32_t instr) {
@@ -208,21 +210,23 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("puts r%d\n", regIdx); /* debug */
 
-    uint32_t *addr = getHeapAddr(ctx, regVal);
+    uint8_t *addr = getHeapAddr(ctx, regVal);
 
-    printf("%s", (char *) addr);
+    printf("%s\n", (char *) addr);
 }
 
 void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
+    // Input from stdin
     char buf[128];
     fgets(buf, 128, stdin);
 
-    uint32_t *addr = getHeapAddr(ctx, regVal);
+    uint8_t *addr = getHeapAddr(ctx, regVal);
 
     strcpy((char *) addr, buf);
+}
 
 void instr_invalid(struct VMContext* ctx, const uint32_t instr) {
     (void) ctx;
@@ -269,7 +273,7 @@ int main(int argc, char **argv) {
     VMContext vm;
     Reg r[NUM_REGS];
     FunPtr f[NUM_FUNCS];
-    uint32_t *heap;
+    uint8_t *heap;
     FILE *binaryFile;
     uint32_t *bytecode;
     int codeSize = 0;
@@ -314,11 +318,6 @@ int main(int argc, char **argv) {
     debugf("running...\n\n");                /* debug */
 
     while (is_running) {
-        uint32_t instr = vm.bytecode[vm.pc];
-        uint32_t opcode = EXTRACT_B0(instr);
-
-        debugf("pc: %03d -> 0x%08x\n", vm.pc, instr); /* debug */
-
         debugf("pc: %03d -> 0x%08x\n", vm.pc, vm.bytecode[vm.pc]); /* debug */
 
         stepVMContext(&vm);
