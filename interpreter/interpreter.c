@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 #include "minivm.h"
 
 #define NUM_REGS   (256)
@@ -105,8 +106,30 @@ void instr_puti(struct VMContext* ctx, const uint32_t instr) {
     ctx->r[destRegIdx].value = value;
 }
 
-void instr_add(struct VMContext* ctx, const uint32_t instr) {}
-void instr_sub(struct VMContext* ctx, const uint32_t instr) {}
+void instr_add(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx1 = EXTRACT_B2(instr);
+    uint8_t srcRegIdx2 = EXTRACT_B3(instr);
+
+    printf("add r%d r%d r%d\n", destRegIdx, srcRegIdx1, srcRegIdx2); /* debug */
+
+    ctx->r[destRegIdx].value =
+        ctx->r[srcRegIdx1].value +
+        ctx->r[srcRegIdx2].value;
+}
+
+void instr_sub(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx1 = EXTRACT_B2(instr);
+    uint8_t srcRegIdx2 = EXTRACT_B3(instr);
+
+    printf("sub r%d r%d r%d\n", destRegIdx, srcRegIdx1, srcRegIdx2); /* debug */
+
+    ctx->r[destRegIdx].value =
+        ctx->r[srcRegIdx1].value -
+        ctx->r[srcRegIdx2].value;
+}
+
 void instr_gt(struct VMContext* ctx, const uint32_t instr) {}
 void instr_ge(struct VMContext* ctx, const uint32_t instr) {}
 void instr_eq(struct VMContext* ctx, const uint32_t instr) {}
@@ -206,6 +229,8 @@ int main(int argc, char** argv) {
     fread(pc, codeSize, 1, bytecode); /* read code */
     fclose(bytecode);
 
+    r[4].value = UINT_MAX;
+
     printf("& heap: %p\n", heap);        /* debug */
     printf("# instr: %d\n", codeSize / 4); /* debug */
     printf("running...\n\n");                /* debug */
@@ -218,8 +243,8 @@ int main(int argc, char** argv) {
 
     // Debug: print registers
     printf("\n------- regs -------\n");
-    for (int i = 0; i < 3; i++) {
-        printf("r%d: %d\n", i, vm.r[i].value);
+    for (int i = 0; i < 5; i++) {
+        printf("r%d: %u\n", i, vm.r[i].value);
     }
     printf("--------------------\n");
 

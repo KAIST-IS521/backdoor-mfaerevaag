@@ -1,3 +1,4 @@
-puti r0, 63
-move r1, r0
+puti r3, 1
+add r0, r3, r4
+sub r1, r2, r3
 halt
