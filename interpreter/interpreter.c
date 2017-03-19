@@ -163,8 +163,29 @@ void instr_eq(struct VMContext* ctx, const uint32_t instr) {
         (ctx->r[srcRegIdx1].value == ctx->r[srcRegIdx2].value ? 1 : 0);
 }
 
-void instr_ite(struct VMContext* ctx, const uint32_t instr) {}
-void instr_jump(struct VMContext* ctx, const uint32_t instr) {}
+void instr_ite(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t srcRegIdx = EXTRACT_B1(instr);
+    uint8_t offsetA = EXTRACT_B2(instr);
+    uint8_t offsetB = EXTRACT_B3(instr);
+
+    printf("ite r%d %d %d\n", srcRegIdx, offsetA, offsetB); /* debug */
+
+    // Choose destination instruction
+    int offset = (ctx->r[srcRegIdx].value > 0) ? offsetA : offsetB;
+
+    printf("OFFSET: %d\n", offset);
+
+    if (offset < 0) {
+        log_errf("offset %d must be larger than zero", offset);
+    } else if (offset > ctx->codeSize) {
+        log_errf("offset %d is larger than code size %d", offset, ctx->codeSize);
+    }
+
+    // Set program counter to given offset
+    // (minus one to compensate for pc increment)
+    ctx->pc = offset - 1;
+}
+
 
 void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);

@@ -1,18 +1,8 @@
-puti r111, 1
+puti r0, 10
+puti r1, 1
 
-gt r0, r111, r110
-gt r1, r110, r111
-gt r2, r110, r110
-gt r3, r111, r111
+sub r0, r0, r1
 
-ge r4, r111, r110
-ge r5, r110, r111
-ge r6, r110, r110
-ge r7, r111, r111
-
-eq r8, r111, r110
-eq r9, r110, r111
-eq r10, r110, r110
-eq r11, r111, r111
+ite r0, 2, 4
 
 halt
