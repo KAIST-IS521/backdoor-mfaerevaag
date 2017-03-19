@@ -2,6 +2,10 @@ SOURCES = minivm.h minivm.c
 CFLAGS += -Wall -Wextra
 BUILDDIR = build
 
+ifdef DEBUG
+	CFLAGS += -DDEBUG
+endif
+
 all: $(BUILDDIR) $(BUILDDIR)/libminivm.a $(BUILDDIR)/interpreter
 
 $(BUILDDIR):
