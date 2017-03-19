@@ -1,12 +1,43 @@
-; set number of loop iterations
-puti r0, 5
-; number to subtract by
+; Fibonacci
+; ---------
+; Compute fibonacci number r10 and store in r4
+;
+; Registers:
+; r0 : previous
+; r1 : next
+; r2 : iterator
+; r3 : result
+; ...
+; r10 : argument
+; r11 : constant one
+
+; which fibonacci number to compute
+puti r10, 255
+
+; check if zero
+ite r10, 2, 13
+
+; initialize constants
+puti r11, 1
+
+; initialize firste two numbers in sequence
+puti r0, 0
 puti r1, 1
 
-; subtract
-sub r0, r0, r1
+; initialize loop iterator
+puti r2, 1
 
-; iterate
-ite r0, 2, 4
+; compute sum of previous and current number
+add r3, r0, r1
+
+; update values
+move r0, r1
+move r1, r3
+
+; increment iterator
+add r2, r2, r11
+
+ge r5, r2, r10
+ite r5, 12, 6
 
 halt
