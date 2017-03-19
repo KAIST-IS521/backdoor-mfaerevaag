@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <limits.h>
 #include "minivm.h"
 
 #define NUM_REGS   (256)
@@ -49,12 +48,12 @@ void validateOffset(struct VMContext *ctx, uint32_t offset) {
 // Validates if heap address is within bounds of actual heap
 void validateHeapAddress(struct VMContext *ctx, uint32_t offset) {
     if ((0 < (int32_t) offset) || (offset >= ctx->sizeHeap)) {
-        log_errf("heap address %p invalid\n", (void *) offset);
+        log_errf("heap address 0x%u invalid\n", offset);
     }
 }
 
 // Calculate heap address with offsetting
-uint32_t getHeapAddr(struct VMContext *ctx, uint32_t offset) {
+uint32_t *getHeapAddr(struct VMContext *ctx, uint32_t offset) {
     validateHeapAddress(ctx, offset);
 
     return ctx->heap + offset;
@@ -64,6 +63,9 @@ uint32_t getHeapAddr(struct VMContext *ctx, uint32_t offset) {
 // Instruction execution semantics
 
 void instr_halt(struct VMContext* ctx, const uint32_t instr) {
+    (void) ctx;
+    (void) instr;
+
     debugf("halt\n");           /* debug */
 
     is_running = false;
@@ -76,9 +78,9 @@ void instr_load(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("load r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx, srcRegVal);
+    uint32_t *addr = getHeapAddr(ctx, srcRegVal);
 
-    uint32_t value = *((uint32_t *) addr);
+    uint32_t value = *((uint32_t *) (size_t) addr);
 
     ctx->r[destRegIdx].value = value;
 }
@@ -91,7 +93,7 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("store r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx, destRegVal);
+    uint32_t *addr = getHeapAddr(ctx, destRegVal);
 
     uint32_t value = (uint32_t) EXTRACT_B3(srcRegVal);
 
@@ -208,7 +210,7 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
 
     debugf("puts r%d\n", regIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx, regVal);
+    uint32_t *addr = getHeapAddr(ctx, regVal);
 
     printf("%s", (char *) addr);
 }
@@ -220,9 +222,9 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     char buf[128];
     fgets(buf, 128, stdin);
 
-    uint32_t addr = getHeapAddr(ctx, regVal);
+    uint32_t *addr = getHeapAddr(ctx, regVal);
 
-    strcpy(addr, buf);
+    strcpy((char *) addr, buf);
 }
 
 // Initialize function table

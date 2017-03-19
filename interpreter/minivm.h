@@ -74,7 +74,7 @@ void dispatch(struct VMContext* ctx, const uint32_t instr);
 // Initializes a VMContext in-place.
 // initVMContext :: VMContext -> uint32_t -> uint32_t -> [Reg] -> [FunPtr] -> Effect()
 void initVMContext(struct VMContext* ctx,
-                     const uint32_t* bytecode,
+                           uint32_t* bytecode,
                       const uint32_t codeSize,
                       const uint32_t numRegs,
                       const uint32_t numFuns,
