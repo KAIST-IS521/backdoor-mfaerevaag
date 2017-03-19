@@ -130,9 +130,39 @@ void instr_sub(struct VMContext* ctx, const uint32_t instr) {
         ctx->r[srcRegIdx2].value;
 }
 
-void instr_gt(struct VMContext* ctx, const uint32_t instr) {}
-void instr_ge(struct VMContext* ctx, const uint32_t instr) {}
-void instr_eq(struct VMContext* ctx, const uint32_t instr) {}
+void instr_gt(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx1 = EXTRACT_B2(instr);
+    uint8_t srcRegIdx2 = EXTRACT_B3(instr);
+
+    printf("gt r%d r%d r%d\n", destRegIdx, srcRegIdx1, srcRegIdx2); /* debug */
+
+    ctx->r[destRegIdx].value =
+        (ctx->r[srcRegIdx1].value > ctx->r[srcRegIdx2].value ? 1 : 0);
+}
+
+void instr_ge(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx1 = EXTRACT_B2(instr);
+    uint8_t srcRegIdx2 = EXTRACT_B3(instr);
+
+    printf("ge r%d r%d r%d\n", destRegIdx, srcRegIdx1, srcRegIdx2); /* debug */
+
+    ctx->r[destRegIdx].value =
+        (ctx->r[srcRegIdx1].value >= ctx->r[srcRegIdx2].value ? 1 : 0);
+}
+
+void instr_eq(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx1 = EXTRACT_B2(instr);
+    uint8_t srcRegIdx2 = EXTRACT_B3(instr);
+
+    printf("eq r%d r%d r%d\n", destRegIdx, srcRegIdx1, srcRegIdx2); /* debug */
+
+    ctx->r[destRegIdx].value =
+        (ctx->r[srcRegIdx1].value == ctx->r[srcRegIdx2].value ? 1 : 0);
+}
+
 void instr_ite(struct VMContext* ctx, const uint32_t instr) {}
 void instr_jump(struct VMContext* ctx, const uint32_t instr) {}
 
@@ -229,8 +259,6 @@ int main(int argc, char** argv) {
     fread(pc, codeSize, 1, bytecode); /* read code */
     fclose(bytecode);
 
-    r[4].value = UINT_MAX;
-
     printf("& heap: %p\n", heap);        /* debug */
     printf("# instr: %d\n", codeSize / 4); /* debug */
     printf("running...\n\n");                /* debug */
@@ -243,7 +271,7 @@ int main(int argc, char** argv) {
 
     // Debug: print registers
     printf("\n------- regs -------\n");
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 12; i++) {
         printf("r%d: %u\n", i, vm.r[i].value);
     }
     printf("--------------------\n");

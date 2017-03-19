@@ -1,4 +1,18 @@
-puti r3, 1
-add r0, r3, r4
-sub r1, r2, r3
+puti r111, 1
+
+gt r0, r111, r110
+gt r1, r110, r111
+gt r2, r110, r110
+gt r3, r111, r111
+
+ge r4, r111, r110
+ge r5, r110, r111
+ge r6, r110, r110
+ge r7, r111, r111
+
+eq r8, r111, r110
+eq r9, r110, r111
+eq r10, r110, r110
+eq r11, r111, r111
+
 halt
