@@ -308,7 +308,15 @@ int main(int argc, char **argv) {
     debugf("running...\n\n");                /* debug */
 
     while (is_running) {
-        debugf("pc: %03d -> 0x%08x\n", vm.pc, vm.bytecode[vm.pc]); /* debug */
+        uint32_t instr = vm.bytecode[vm.pc];
+        uint32_t opcode = EXTRACT_B0(instr);
+
+        debugf("pc: %03d -> 0x%08x\n", vm.pc, instr); /* debug */
+
+        // Check if valid opcode
+        if (vm.funtable[opcode] == NULL) {
+            log_errf("[error]: unknown opcode 0x%02x\n", opcode);
+        }
 
         stepVMContext(&vm);
 
