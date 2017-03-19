@@ -60,7 +60,7 @@ uint8_t *getHeapAddr(struct VMContext *ctx, uint32_t offset) {
 
 // Instruction execution semantics
 
-void instr_halt(struct VMContext* ctx, const uint32_t instr) {
+void instrHalt(struct VMContext* ctx, const uint32_t instr) {
     (void) ctx;
     (void) instr;
 
@@ -69,7 +69,7 @@ void instr_halt(struct VMContext* ctx, const uint32_t instr) {
     is_running = false;
 }
 
-void instr_load(struct VMContext* ctx, const uint32_t instr) {
+void instrLoad(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx = EXTRACT_B2(instr);
     uint32_t srcRegVal = ctx->r[srcRegIdx].value;
@@ -84,7 +84,7 @@ void instr_load(struct VMContext* ctx, const uint32_t instr) {
     ctx->r[destRegIdx].value = value;
 }
 
-void instr_store(struct VMContext* ctx, const uint32_t instr) {
+void instrStore(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx = EXTRACT_B2(instr);
     uint32_t destRegVal = ctx->r[destRegIdx].value;
@@ -100,7 +100,7 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
     *addr = value;
 }
 
-void instr_move(struct VMContext* ctx, const uint32_t instr) {
+void instrMove(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx = EXTRACT_B2(instr);
 
@@ -109,7 +109,7 @@ void instr_move(struct VMContext* ctx, const uint32_t instr) {
     ctx->r[destRegIdx].value = ctx->r[srcRegIdx].value;
 }
 
-void instr_puti(struct VMContext* ctx, const uint32_t instr) {
+void instrPuti(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t v = EXTRACT_B2(instr);
 
@@ -120,7 +120,7 @@ void instr_puti(struct VMContext* ctx, const uint32_t instr) {
     ctx->r[destRegIdx].value = value;
 }
 
-void instr_add(struct VMContext* ctx, const uint32_t instr) {
+void instrAdd(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx1 = EXTRACT_B2(instr);
     uint8_t srcRegIdx2 = EXTRACT_B3(instr);
@@ -132,7 +132,7 @@ void instr_add(struct VMContext* ctx, const uint32_t instr) {
         ctx->r[srcRegIdx2].value;
 }
 
-void instr_sub(struct VMContext* ctx, const uint32_t instr) {
+void instrSub(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx1 = EXTRACT_B2(instr);
     uint8_t srcRegIdx2 = EXTRACT_B3(instr);
@@ -144,7 +144,7 @@ void instr_sub(struct VMContext* ctx, const uint32_t instr) {
         ctx->r[srcRegIdx2].value;
 }
 
-void instr_gt(struct VMContext* ctx, const uint32_t instr) {
+void instrGt(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx1 = EXTRACT_B2(instr);
     uint8_t srcRegIdx2 = EXTRACT_B3(instr);
@@ -155,7 +155,7 @@ void instr_gt(struct VMContext* ctx, const uint32_t instr) {
         (ctx->r[srcRegIdx1].value > ctx->r[srcRegIdx2].value ? 1 : 0);
 }
 
-void instr_ge(struct VMContext* ctx, const uint32_t instr) {
+void instrGe(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx1 = EXTRACT_B2(instr);
     uint8_t srcRegIdx2 = EXTRACT_B3(instr);
@@ -166,7 +166,7 @@ void instr_ge(struct VMContext* ctx, const uint32_t instr) {
         (ctx->r[srcRegIdx1].value >= ctx->r[srcRegIdx2].value ? 1 : 0);
 }
 
-void instr_eq(struct VMContext* ctx, const uint32_t instr) {
+void instrEq(struct VMContext* ctx, const uint32_t instr) {
     uint8_t destRegIdx = EXTRACT_B1(instr);
     uint8_t srcRegIdx1 = EXTRACT_B2(instr);
     uint8_t srcRegIdx2 = EXTRACT_B3(instr);
@@ -177,7 +177,7 @@ void instr_eq(struct VMContext* ctx, const uint32_t instr) {
         (ctx->r[srcRegIdx1].value == ctx->r[srcRegIdx2].value ? 1 : 0);
 }
 
-void instr_ite(struct VMContext* ctx, const uint32_t instr) {
+void instrIte(struct VMContext* ctx, const uint32_t instr) {
     uint8_t srcRegIdx = EXTRACT_B1(instr);
     uint8_t offsetA = EXTRACT_B2(instr);
     uint8_t offsetB = EXTRACT_B3(instr);
@@ -194,7 +194,7 @@ void instr_ite(struct VMContext* ctx, const uint32_t instr) {
     ctx->pc = offset - 1;
 }
 
-void instr_jump(struct VMContext* ctx, const uint32_t instr) {
+void instrJump(struct VMContext* ctx, const uint32_t instr) {
     uint8_t offset = EXTRACT_B2(instr);
 
     debugf("jump %d\n", offset); /* debug */
@@ -204,7 +204,7 @@ void instr_jump(struct VMContext* ctx, const uint32_t instr) {
     ctx->pc = offset - 1;
 }
 
-void instr_puts(struct VMContext* ctx, const uint32_t instr) {
+void instrPuts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
@@ -215,7 +215,7 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     printf("%s", (char *) addr);
 }
 
-void instr_gets(struct VMContext* ctx, const uint32_t instr) {
+void instrGets(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
     uint32_t regVal = ctx->r[regIdx].value;
 
@@ -234,7 +234,7 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     strcpy((char *) addr, buf);
 }
 
-void instr_invalid(struct VMContext* ctx, const uint32_t instr) {
+void instrInvalid(struct VMContext* ctx, const uint32_t instr) {
     (void) ctx;
     uint8_t opcode = EXTRACT_B0(instr);
 
@@ -247,24 +247,24 @@ void initFuncs(FunPtr *f, uint32_t cnt) {
 
     // Set all functions to invalid
     for (i = 0; i < cnt; i++) {
-        f[i] = instr_invalid;
+        f[i] = instrInvalid;
     }
 
     // Set function pointers in function table
-    f[0x00] = instr_halt;
-    f[0x10] = instr_load;
-    f[0x20] = instr_store;
-    f[0x30] = instr_move;
-    f[0x40] = instr_puti;
-    f[0x50] = instr_add;
-    f[0x60] = instr_sub;
-    f[0x70] = instr_gt;
-    f[0x80] = instr_ge;
-    f[0x90] = instr_eq;
-    f[0xa0] = instr_ite;
-    f[0xb0] = instr_jump;
-    f[0xc0] = instr_puts;
-    f[0xd0] = instr_gets;
+    f[0x00] = instrHalt;
+    f[0x10] = instrLoad;
+    f[0x20] = instrStore;
+    f[0x30] = instrMove;
+    f[0x40] = instrPuti;
+    f[0x50] = instrAdd;
+    f[0x60] = instrSub;
+    f[0x70] = instrGt;
+    f[0x80] = instrGe;
+    f[0x90] = instrEq;
+    f[0xa0] = instrIte;
+    f[0xb0] = instrJump;
+    f[0xc0] = instrPuts;
+    f[0xd0] = instrGets;
 }
 
 void initRegs(Reg *r, uint32_t cnt) {
