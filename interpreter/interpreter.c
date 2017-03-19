@@ -223,13 +223,21 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     uint32_t *addr = getHeapAddr(ctx, regVal);
 
     strcpy((char *) addr, buf);
+
+void instr_invalid(struct VMContext* ctx, const uint32_t instr) {
+    (void) ctx;
+    uint8_t opcode = EXTRACT_B0(instr);
+
+    log_errf("[error]: unknown opcode 0x%02x\n", opcode);
 }
 
 // Initialize function table
 void initFuncs(FunPtr *f, uint32_t cnt) {
     uint32_t i;
+
+    // Set all functions to invalid
     for (i = 0; i < cnt; i++) {
-        f[i] = NULL;
+        f[i] = instr_invalid;
     }
 
     // Set function pointers in function table
@@ -311,10 +319,7 @@ int main(int argc, char **argv) {
 
         debugf("pc: %03d -> 0x%08x\n", vm.pc, instr); /* debug */
 
-        // Check if valid opcode
-        if (vm.funtable[opcode] == NULL) {
-            log_errf("[error]: unknown opcode 0x%02x\n", opcode);
-        }
+        debugf("pc: %03d -> 0x%08x\n", vm.pc, vm.bytecode[vm.pc]); /* debug */
 
         stepVMContext(&vm);
 
