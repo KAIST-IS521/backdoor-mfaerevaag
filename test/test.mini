@@ -1,3 +1,4 @@
-gets r0
-puts r0
+store r1, r0
+load r1, r3
+puts r3
 halt

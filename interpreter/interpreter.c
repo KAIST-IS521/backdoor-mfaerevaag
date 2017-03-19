@@ -34,6 +34,7 @@ bool validHeapAddress(uint32_t addr) {
     return (0 <= addr) && (addr < SIZE_HEAP);
 }
 
+// Calculate heap address with offsetting
 uint32_t getHeapAddr(uint32_t heap, uint32_t offset) {
     if (!validHeapAddress(offset)) {
         log_errf("heap address %p invalid", offset);
@@ -51,8 +52,39 @@ void instr_halt(struct VMContext* ctx, const uint32_t instr) {
     is_running = false;
 }
 
-void instr_load(struct VMContext* ctx, const uint32_t instr) {}
-void instr_store(struct VMContext* ctx, const uint32_t instr) {}
+void instr_load(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx = EXTRACT_B2(instr);
+    uint32_t srcRegVal = ctx->r[srcRegIdx].value;
+
+    printf("load r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
+
+    uint32_t addr = getHeapAddr(ctx->heap, srcRegVal);
+
+    uint32_t value = *((uint32_t *) addr);
+
+    printf("VALUE: %d\n", value);
+
+    ctx->r[destRegIdx].value = value;
+}
+
+void instr_store(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t srcRegIdx = EXTRACT_B2(instr);
+    uint32_t destRegVal = ctx->r[destRegIdx].value;
+    uint32_t srcRegVal = ctx->r[srcRegIdx].value;
+
+    printf("store r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
+
+    uint32_t addr = getHeapAddr(ctx->heap, destRegVal);
+
+    uint32_t value = (uint32_t) EXTRACT_B3(srcRegVal);
+
+    printf("VALUE: %d\n", value);
+
+    *((uint32_t *) addr) = value;
+}
+
 void instr_move(struct VMContext* ctx, const uint32_t instr) {}
 void instr_puti(struct VMContext* ctx, const uint32_t instr){}
 void instr_add(struct VMContext* ctx, const uint32_t instr) {}
@@ -69,7 +101,6 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
 
     printf("puts r%d\n", regIdx); /* debug */
 
-    // Calculate heap address with offsetting
     uint32_t addr = getHeapAddr(ctx->heap, regVal);
 
     printf("%s", (char *) addr);
@@ -82,7 +113,6 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     char buf[128];
     fgets(buf, 128, stdin);
 
-    // Calculate heap address with offsetting
     uint32_t addr = getHeapAddr(ctx->heap, regVal);
 
     strcpy(addr, buf);
