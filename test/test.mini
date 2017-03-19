@@ -1,3 +1,5 @@
+puti r0, 63
+puti r1, 255
 store r1, r0
 load r1, r3
 puts r3

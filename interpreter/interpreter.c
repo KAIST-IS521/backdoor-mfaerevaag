@@ -86,7 +86,18 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
 }
 
 void instr_move(struct VMContext* ctx, const uint32_t instr) {}
-void instr_puti(struct VMContext* ctx, const uint32_t instr){}
+
+void instr_puti(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t destRegIdx = EXTRACT_B1(instr);
+    uint8_t v = EXTRACT_B2(instr);
+
+    uint32_t value = (uint32_t) v;
+
+    printf("puti r%d %d\n", destRegIdx, value); /* debug */
+
+    ctx->r[destRegIdx].value = value;
+}
+
 void instr_add(struct VMContext* ctx, const uint32_t instr) {}
 void instr_sub(struct VMContext* ctx, const uint32_t instr) {}
 void instr_gt(struct VMContext* ctx, const uint32_t instr) {}
