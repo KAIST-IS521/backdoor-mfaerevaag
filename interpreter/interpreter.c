@@ -30,18 +30,27 @@ void usageExit(char **argv) {
     exit(1);
 }
 
+// Validates if instruction offset is valid
+void validateOffset(struct VMContext *ctx, uint32_t offset) {
+    if ((int32_t) offset < 0) {
+        log_errf("offset %d must be larger than zero", offset);
+    } else if (offset > ctx->codeSize) {
+        log_errf("offset %d is larger than code size %d", offset, ctx->codeSize);
+    }
+}
+
 // Validates if heap address is within bounds of actual heap
-bool validHeapAddress(uint32_t addr) {
-    return (0 <= addr) && (addr < SIZE_HEAP);
+void validateHeapAddress(struct VMContext *ctx, uint32_t offset) {
+    if ((0 < (int32_t) offset) || (offset >= ctx->sizeHeap)) {
+        log_errf("heap address %p invalid", (void *) offset);
+    }
 }
 
 // Calculate heap address with offsetting
-uint32_t getHeapAddr(uint32_t heap, uint32_t offset) {
-    if (!validHeapAddress(offset)) {
-        log_errf("heap address %p invalid", offset);
-    }
+uint32_t getHeapAddr(struct VMContext *ctx, uint32_t offset) {
+    validateHeapAddress(ctx, offset);
 
-    return heap + offset;
+    return ctx->heap + offset;
 }
 
 
@@ -60,7 +69,7 @@ void instr_load(struct VMContext* ctx, const uint32_t instr) {
 
     printf("load r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx->heap, srcRegVal);
+    uint32_t addr = getHeapAddr(ctx, srcRegVal);
 
     uint32_t value = *((uint32_t *) addr);
 
@@ -77,7 +86,7 @@ void instr_store(struct VMContext* ctx, const uint32_t instr) {
 
     printf("store r%d r%d\n", destRegIdx, srcRegIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx->heap, destRegVal);
+    uint32_t addr = getHeapAddr(ctx, destRegVal);
 
     uint32_t value = (uint32_t) EXTRACT_B3(srcRegVal);
 
@@ -175,11 +184,7 @@ void instr_ite(struct VMContext* ctx, const uint32_t instr) {
 
     printf("OFFSET: %d\n", offset);
 
-    if (offset < 0) {
-        log_errf("offset %d must be larger than zero", offset);
-    } else if (offset > ctx->codeSize) {
-        log_errf("offset %d is larger than code size %d", offset, ctx->codeSize);
-    }
+    validateOffset(ctx, offset);
 
     // Set program counter to given offset
     // (minus one to compensate for pc increment)
@@ -193,7 +198,7 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
 
     printf("puts r%d\n", regIdx); /* debug */
 
-    uint32_t addr = getHeapAddr(ctx->heap, regVal);
+    uint32_t addr = getHeapAddr(ctx, regVal);
 
     printf("%s", (char *) addr);
 }
@@ -205,7 +210,7 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     char buf[128];
     fgets(buf, 128, stdin);
 
-    uint32_t addr = getHeapAddr(ctx->heap, regVal);
+    uint32_t addr = getHeapAddr(ctx, regVal);
 
     strcpy(addr, buf);
 }
