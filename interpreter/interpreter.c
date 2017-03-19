@@ -34,7 +34,7 @@ void usageExit(char **argv) {
 void validateOffset(struct VMContext *ctx, uint32_t offset) {
     if ((int32_t) offset < 0) {
         log_errf("offset %d must be larger than zero", offset);
-    } else if (offset > ctx->codeSize) {
+    } else if (offset >= ctx->codeSize) {
         log_errf("offset %d is larger than code size %d", offset, ctx->codeSize);
     }
 }
