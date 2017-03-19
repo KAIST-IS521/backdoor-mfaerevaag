@@ -191,6 +191,15 @@ void instr_ite(struct VMContext* ctx, const uint32_t instr) {
     ctx->pc = offset - 1;
 }
 
+void instr_jump(struct VMContext* ctx, const uint32_t instr) {
+    uint8_t offset = EXTRACT_B2(instr);
+
+    printf("jump %d\n", offset); /* debug */
+
+    // Set program counter to given offset
+    // (minus one to compensate for pc increment)
+    ctx->pc = offset - 1;
+}
 
 void instr_puts(struct VMContext* ctx, const uint32_t instr) {
     uint8_t regIdx = EXTRACT_B1(instr);
