@@ -212,7 +212,7 @@ void instr_puts(struct VMContext* ctx, const uint32_t instr) {
 
     uint8_t *addr = getHeapAddr(ctx, regVal);
 
-    printf("%s\n", (char *) addr);
+    printf("%s", (char *) addr);
 }
 
 void instr_gets(struct VMContext* ctx, const uint32_t instr) {
@@ -222,6 +222,12 @@ void instr_gets(struct VMContext* ctx, const uint32_t instr) {
     // Input from stdin
     char buf[128];
     fgets(buf, 128, stdin);
+
+    // Remove trailing new line char
+    char *posNewline;
+    if ((posNewline = strchr(buf, '\n')) != NULL) {
+        *posNewline = '\0';
+    }
 
     uint8_t *addr = getHeapAddr(ctx, regVal);
 
