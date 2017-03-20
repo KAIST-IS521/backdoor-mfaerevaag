@@ -34,3 +34,7 @@ starts with initializing the variables `prev` and `next`. After this
 we set up a iterative loop starting at one. For each iteration we sum
 our two numbers and store the value. If having iterated as many times
 as first declared, jump forward, if not jump back to start of loop.
+
+The Fibonacci number to compute is initially set in register r10. The
+current program computer the 255'th. The output is the computed
+Fibonacci number, which is stored in register r3.

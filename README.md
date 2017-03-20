@@ -4,7 +4,7 @@ by [mfaerevaag](github.com/mfaerevaag)
 
 ## Contents
  * [login/login.mini](login/login.mini): A port of the C login-snippet.
- * [test/test.mini](test/test.mini): Random test program in Mini Lang.
+ * [test/test.mini](test/test.mini): Fibonacci test program in Mini Lang.
  * [test/test.md](test/test.md): Description of test program,
    including input/output and pseudocode.
  * [backdoor/](backdoor/): Directory containing copy of interpreter
