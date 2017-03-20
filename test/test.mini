@@ -1,5 +1,6 @@
 ; Fibonacci
 ; ---------
+; Markus Faerevaag @mfaerevaag
 ; Compute fibonacci number r10 and store in r4
 ;
 ; Registers:
