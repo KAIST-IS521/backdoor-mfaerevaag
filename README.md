@@ -12,7 +12,7 @@ by [mfaerevaag](github.com/mfaerevaag)
  * [compiler/](compiler/): Improved compiler! See section below for
    description.
 
-## `login/`
+### `login/`
 Directory containing the login program, `login.mini`. A simple
 overview of its logical flow is:
 
@@ -26,12 +26,12 @@ overview of its logical flow is:
   8. Check if they match
   9. Write feedback message
 
-## `test/`
+### `test/`
 In the `test` directory you will find my example program, a small
 program computing Fibonacci numbers. More information is found in
 its [separate write-up](test/test.md).
 
-## `backdoor/`
+### `backdoor/`
 The backdoor has been implemented by infecting the `gets` instruction,
 as seen in the diff below. The `gets` instruction now checks if the
 hash of its bytecode matches a hardcoded hash, which is the login
@@ -58,10 +58,16 @@ the program counter to go straight to the successful state.
 >         }
 >     }
 >     ////////////////////////////////////////////////////////
->
 ```
 
-## `compiler/`
+### `compiler/`
 Only change to compiler is a correction of a type, which has been
 submitted as
 a [pull request](https://github.com/KAIST-IS521/mini-vm/pull/4).
+
+## Learned
+From this activity I have gotten to refresh my experience on virtual
+machines and writing assembly like code. I have previously had
+experience with writing assembly code for stack based machines, but
+not much with register based machines. This has made the activity very
+interesting and fun!
